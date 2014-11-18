@@ -1,0 +1,67 @@
+
+#Command to delete all containers
+
+docker rm `docker ps --no-trunc -aq`
+
+REMOVE EMPTY IMAGHES
+
+sudo docker rmi $(sudo docker images -f "dangling=true" -q)
+
+
+
+
+To detatch →  Control P Control Q
+
+sudo docker run -dit -p 9080:8080 sl6-tomcat7:v1 /bin/bash
+
+docker run -p 9080:8080 -d sl6-tomcat7:v1
+
+pass in the war name -->  docker run -p 9080:8080 -d sl6-tomcat7:v1 -w 'eureka.war'
+
+
+49167
+8080
+1d71ad72f6eb
+172.17.0.39
+
+Containers
+
+Mongo (https://registry.hub.docker.com/_/mongo/)
+
+docker run --name mongocontainer -p 27017:27017 -d mongo:latest
+
+Eureka
+
+docker run -p 9080:8080 -d sl6-tomcat7:v1 -w 'eureka.war'
+
+To call mongo shell
+
+docker run -it --link mongocontainer:mongo --rm mongo sh -c 'exec mongo "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT"'
+
+
+Cassandra (https://registry.hub.docker.com/u/spotify/cassandra/dockerfile/)
+
+docker run --name cassandracontainer -p 9042:9042 -d spotify/cassandra
+
+
+
+Elk (https://registry.hub.docker.com/u/qnib/elk/)
+
+docker run --name elkcontainer -p 9042:9042 -d qnib/elk
+
+
+STANDALONE
+
+docker run -tiP sl6-standalone:v1 -/bin/bash
+
+
+java -Deureka.environment=test -Deureka.client.props=app1-eureka-docker -jar target/cloud-app-simple.jar --server.port=9000 --debug
+
+
+sudo docker build -t="basesl6:v1" .
+
+
+docker run --name artifactserver -tiP -d sl6-standalone:v1 -j 'nick-artifact-server-1.0.0-20141110.182502-1.jar' -t 'nexus' -/bin/bash
+
+
+docker run --name artifactserver -ti -p 8080:8080 -d sl6-standalone:v1 -j 'nick-artifact-server-0.0.1-20141112.154651-5.jar' -u 'http://10.211.40.19/nexus/content/repositories/team_prismj_snapshots/com/digitalriver/servicepoc/nick-artifact-server/0.0.1-SNAPSHOT/nick-artifact-server-0.0.1-20141112.154651-5.jar' -t 'nexus'

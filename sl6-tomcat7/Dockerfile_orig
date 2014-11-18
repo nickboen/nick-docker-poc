@@ -1,0 +1,56 @@
+FROM basesl6:v2
+MAINTAINER Nick Boen <nboen@digitalriver.com>
+
+
+# Build command for the Dockerfile
+#  sudo docker build -t="sl6-tomcat7:v1" .
+
+# Run command for the image
+#  docker run -itP sl6-tomcat7:v1 /bin/bash
+
+EXPOSE 8080
+
+ENV TOMCAT_VERSION 7.0.56
+
+# Add some OS tools
+#RUN yum install net-tools unzip wget -y
+RUN yum install net-tools wget tar -y
+
+# Add tomcat
+RUN cd /opt
+WORKDIR /opt
+#RUN wget http://mirror.nexcess.net/apache/tomcat/tomcat-7/v7.0.56/bin/apache-tomcat-7.0.56.zip
+#RUN unzip apache-tomcat-7.0.56.zip
+RUN wget http://archive.apache.org/dist/tomcat/tomcat-7/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz -O /tmp/catalina.tar.gz && tar xzf /tmp/catalina.tar.gz -C /opt && ln -s /opt/apache-tomcat-${TOMCAT_VERSION} /opt/tomcat && rm /tmp/catalina.tar.gz
+
+# Copy over the tomcat environment file
+#ADD script.sh /etc/profile.d/script.sh
+#RUN chmod +x /etc/profile.d/script.sh
+#RUN source /etc/profile.d/script.sh
+
+# Copy over the tomcat users file
+ADD tomcat-users.xml /opt/tomcat/conf/tomcat-users.xml
+RUN chmod u=rw,g=rw,o=r /opt/tomcat/conf/tomcat-users.xml
+
+# Copy over the tomcat service file
+ADD tomcat7-servicescript /etc/rc.d/init.d/tomcat7
+RUN chmod u=rwx,g=rx,o=rx /etc/rc.d/init.d/tomcat7
+
+# Copy over the tomcat start script that is called by the tomcat service script
+ADD tomcat7-startscript /opt/tomcat/tomcat7
+RUN chmod u=rwx,g=rx,o=rx /opt/tomcat/tomcat7
+
+#Copy over the tomcat7.conf script
+ADD tomcat7.conf /opt/tomcat/tomcat7.conf
+RUN chmod u=rw,g=rw,o=r /opt/tomcat/tomcat7.conf
+
+# Add the tomcat users
+RUN useradd -d /opt/tomcat tomcat 
+RUN chown -R tomcat. /opt/tomcat 
+RUN chkconfig --add tomcat7
+RUN chkconfig tomcat7 on
+
+
+CMD service tomcat7 start
+
+
